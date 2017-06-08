@@ -6,6 +6,7 @@ class Table(collections.MutableMapping):
     # mapping of this class to alphatwirl
     mapping = {
         'input_values': 'valAttrNames',
+        'keyAttrNames': 'valAttrNames',
         'output_columns': 'valOutColumnNames',
         'indices': 'valIndices',
         'bins': 'binnings',
