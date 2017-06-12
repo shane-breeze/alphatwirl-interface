@@ -30,3 +30,8 @@ def build_counter_collector_pair(df_cfg):
     deliveryMethod = None
     collector = alphatwirl.loop.Collector(resultsCombinationMethod, deliveryMethod)
     return reader, collector
+
+def to_null_collector_pairs(analyzers):
+    ret = [(r, alphatwirl.loop.NullCollector()) for r in analyzers]
+    return ret
+
