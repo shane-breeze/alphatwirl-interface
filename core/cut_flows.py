@@ -12,4 +12,4 @@ def cut_flow_with_counter(cut_flow, cut_flow_summary_filename):
     )
     deliveryMethod = alphatwirl.collector.WriteListToFile(cut_flow_summary_filename)
     collector = alphatwirl.loop.Collector(resultsCombinationMethod, deliveryMethod)
-    return eventSelection, collector
+    return [(eventSelection, collector)]
