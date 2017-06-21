@@ -1,9 +1,8 @@
-# Tai Sakuma <tai.sakuma@cern.ch>
 import logging
-
 import alphatwirl
+import sys
 
-##__________________________________________________________________||
+
 class Parallel(object):
     def __init__(self, progressMonitor, communicationChannel):
         self.progressMonitor = progressMonitor
@@ -24,8 +23,8 @@ class Parallel(object):
         self.progressMonitor.end()
         self.communicationChannel.end()
 
-##__________________________________________________________________||
-def build_parallel(parallel_mode, quiet = True, processes = 4, user_modules = [ ], htcondor_job_desc_extra = [ ]):
+
+def build_parallel(parallel_mode, quiet = True, n_processes = 4, user_modules = [ ], htcondor_job_desc_extra = [ ]):
 
     default_parallel_mode = 'multiprocessing'
 
@@ -43,16 +42,24 @@ def build_parallel(parallel_mode, quiet = True, processes = 4, user_modules = [ 
             parallel_mode, default_parallel_mode
         ))
 
-    return build_parallel_multiprocessing(quiet = quiet, processes = processes)
+    return build_parallel_multiprocessing(quiet = quiet, n_processes = n_processes)
 
-##__________________________________________________________________||
+
 def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc_extra = [ ]):
     tmpdir = '_ccsp_temp'
     user_modules = set(user_modules)
-    user_modules.add('fwtwirl')
+    user_modules.add('alphatwirl_interface')
     user_modules.add('alphatwirl')
     alphatwirl.mkdir_p(tmpdir)
-    progressMonitor = alphatwirl.progressbar.NullProgressMonitor()
+
+    if quiet:
+        progressMonitor = alphatwirl.progressbar.NullProgressMonitor()
+    else:
+        if sys.stdout.isatty():
+            progressBar = alphatwirl.progressbar.ProgressBar()
+        else:
+            progressBar = alphatwirl.progressbar.ProgressPrint()
+        progressMonitor = alphatwirl.progressbar.BProgressMonitor(presentation=progressBar)
     if parallel_mode == 'htcondor':
         dispatcher = alphatwirl.concurrently.HTCondorJobSubmitter(job_desc_extra = htcondor_job_desc_extra)
     else:
@@ -65,14 +72,11 @@ def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc
         workingArea = workingArea,
         dispatcher = dispatcher
     )
-    communicationChannel = alphatwirl.concurrently.CommunicationChannel(
-        dropbox = dropbox
-    )
+    communicationChannel = alphatwirl.concurrently.CommunicationChannel(dropbox=dropbox)
+
     return Parallel(progressMonitor, communicationChannel)
 
-##__________________________________________________________________||
-def build_parallel_multiprocessing(quiet, processes):
-    progressMonitor, communicationChannel = alphatwirl.configure.build_progressMonitor_communicationChannel(quiet = quiet, processes = processes)
-    return Parallel(progressMonitor, communicationChannel)
 
-##__________________________________________________________________||
+def build_parallel_multiprocessing(quiet, n_processes):
+    progressMonitor, communicationChannel = alphatwirl.configure.build_progressMonitor_communicationChannel(quiet = quiet, processes = n_processes)
+    return Parallel(progressMonitor, communicationChannel)

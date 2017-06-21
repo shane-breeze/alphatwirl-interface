@@ -23,11 +23,11 @@ class FrameworkHeppy(object):
 
     Args:
         outdir (str): the output directory
-        datamc (str): 'data' or 'mc'
+        isdata (bool): true if is data, false if from MC
         force (bool): overwrite the output if True
         quiet (bool): don't show progress bars if True
         parallel_mode (str): 'multiprocessing', 'subprocess', 'htcondor'
-        process (int): the number of processes for the 'multiprocessing' mode
+        n_processes (int): the number of processes for the 'multiprocessing' mode
         user_modules (list of str): names of python modules to be copied for the 'subprocess' mode
         max_events_per_dataset (int):
         max_events_per_process (int):
@@ -36,11 +36,11 @@ class FrameworkHeppy(object):
 
     """
     def __init__(self, outdir, heppydir,
-                 datamc = 'mc',
+                 isdata = False,
                  force = False, quiet = False,
                  parallel_mode = 'multiprocessing',
                  htcondor_job_desc_extra = [ ],
-                 process = 8,
+                 n_processes = 8,
                  user_modules = (),
                  max_events_per_dataset = -1, max_events_per_process = -1,
                  profile = False, profile_out_path = None
@@ -48,22 +48,23 @@ class FrameworkHeppy(object):
         self.parallel = build_parallel(
             parallel_mode = parallel_mode,
             quiet = quiet,
-            processes = process,
+            n_processes = n_processes,
             user_modules = user_modules,
             htcondor_job_desc_extra = htcondor_job_desc_extra
         )
         self.outdir = outdir
         self.heppydir = heppydir
-        self.datamc = datamc
+        self.isdata = isdata
         self.force =  force
         self.max_events_per_dataset = max_events_per_dataset
         self.max_events_per_process = max_events_per_process
         self.profile = profile
         self.profile_out_path = profile_out_path
 
-    def run(self, components,
+    def run(self, 
             reader_collector_pairs,
-            analyzerName = 'roctree',
+            components=None,
+            analyzerName = 'treeProducerSusyAlphaT',
             fileName = 'tree.root',
             treeName = 'tree'
     ):
@@ -107,7 +108,7 @@ class FrameworkHeppy(object):
             component_readers.add(tblDataset)
 
         # tbl_xsec.txt for MC
-        if self.datamc == 'mc':
+        if not self.isdata:
             tbl_xsec_path = os.path.join(self.outdir, 'tbl_xsec.txt')
             if self.force or not os.path.exists(tbl_xsec_path):
                 tblXsec = alphatwirl.heppyresult.TblComponentConfig(
@@ -118,7 +119,7 @@ class FrameworkHeppy(object):
                 component_readers.add(tblXsec)
 
         # tbl_nevt.txt for MC
-        if self.datamc == 'mc':
+        if not self.isdata:
             tbl_nevt_path = os.path.join(self.outdir, 'tbl_nevt.txt')
             if self.force or not os.path.exists(tbl_nevt_path):
                 tblNevt = alphatwirl.heppyresult.TblCounter(
@@ -148,7 +149,7 @@ class FrameworkHeppy(object):
             maxEvents = self.max_events_per_dataset,
             maxEventsPerRun = self.max_events_per_process
         )
-        eventReader = alphatwirl.loop.EventReader(
+        eventReader = alphatwirl.loop.EventsInDatasetReader(
             eventLoopRunner = eventLoopRunner,
             reader = reader,
             collector = collector,
