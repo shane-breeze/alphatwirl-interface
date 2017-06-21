@@ -72,12 +72,14 @@ class FrameworkHeppy(object):
         self._begin()
         try:
             loop = self._configure(components, reader_collector_pairs, analyzerName, fileName, treeName)
-            self._run(loop)
+            ret_val = self._run(loop)
         except KeyboardInterrupt:
             logger = logging.getLogger(__name__)
             logger.warning('received KeyboardInterrupt')
+            ret_val = ["Interrupted"]
             pass
         self._end()
+        return ret_val
 
     def _begin(self):
         self.parallel.begin()
@@ -169,9 +171,13 @@ class FrameworkHeppy(object):
 
     def _run(self, componentLoop):
         if not self.profile:
-            componentLoop()
+            ret_val = componentLoop()
         else:
-            profile_func(func = componentLoop, profile_out_path = self.profile_out_path)
+            ret_val = profile_func(func = componentLoop, profile_out_path = self.profile_out_path)
+
+        # Only the last entry in the list of component_readers will be the user-requested data
+        # Other entries are the other tables that we create to help book-keeping, and which are saved to file automatically
+        return ret_val[-1]
 
     def _end(self):
         self.parallel.end()
