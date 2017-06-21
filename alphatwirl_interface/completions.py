@@ -27,7 +27,7 @@ def build_counter_collector_pair(df_cfg):
     resultsCombinationMethod = alphatwirl.collector.ToDataFrame(
         summaryColumnNames = df_cfg['keyOutColumnNames'] + df_cfg['valOutColumnNames']
     )
-    deliveryMethod = None
+    deliveryMethod = alphatwirl.collector.WritePandasDataFrameToFile(df_cfg['outFilePath'])
     collector = alphatwirl.loop.Collector(resultsCombinationMethod, deliveryMethod)
     return reader, collector
 
