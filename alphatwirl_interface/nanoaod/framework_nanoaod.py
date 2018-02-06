@@ -30,6 +30,7 @@ class FrameworkNanoAOD(object):
         user_modules (list of str): names of python modules to be copied for the 'subprocess' mode
         max_events_per_dataset (int):
         max_events_per_process (int):
+        max_files_per_run (int):
         profile (bool): run cProfile if True
         profile_out_path (bool): path to store the result of the profile. stdout if None
 
@@ -41,6 +42,7 @@ class FrameworkNanoAOD(object):
                  n_processes = 8,
                  user_modules = (),
                  max_events_per_dataset = -1, max_events_per_process = -1,
+                 max_files_per_run = 1,
                  profile = False, profile_out_path = None
     ):
         self.parallel = build_parallel(
@@ -55,6 +57,7 @@ class FrameworkNanoAOD(object):
         self.force =  force
         self.max_events_per_dataset = max_events_per_dataset
         self.max_events_per_process = max_events_per_process
+        self.max_files_per_run = max_files_per_run
         self.profile = profile
         self.profile_out_path = profile_out_path
 
@@ -143,7 +146,7 @@ class FrameworkNanoAOD(object):
             eventBuilderConfigMaker = event_builder_config_maker,
             maxEvents = self.max_events_per_dataset,
             maxEventsPerRun = self.max_events_per_process,
-            maxFilesPerRun = 1,
+            maxFilesPerRun = self.max_files_per_run,
         )
         event_reader = alphatwirl.loop.EventsInDatasetReader(
             eventLoopRunner = event_loop_runner,
