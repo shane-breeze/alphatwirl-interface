@@ -1,13 +1,12 @@
 from alphatwirl_interface.nanoaod.framework_nanoaod import FrameworkNanoAOD
 
-def build_job_manager(outdir, nanoaod_dir, **kwargs):
+def build_job_manager(outdir, **kwargs):
     """
     Create a standard nanoAOD job runner, which will process inputs in parallel
     on an htcondor cluster
 
     Parameters
     - outdir (str) --- the path to the output directory for files
-    - nanoaod_dir (str) --- the path to the input nanoaod directory, containing the component directories
     - kwargs -- all extra arguments are passed through to the underlying FrameworkNanoAOD instance
     """
     htcondor_job_desc_extra_request = ['request_memory = 250']
@@ -38,7 +37,6 @@ def build_job_manager(outdir, nanoaod_dir, **kwargs):
 
     nanoaod_mgr = FrameworkNanoAOD(
         outdir = outdir,
-        nanoaod_dir = nanoaod_dir,
         htcondor_job_desc_extra = htcondor_job_desc_extra,
         **kwargs
     )

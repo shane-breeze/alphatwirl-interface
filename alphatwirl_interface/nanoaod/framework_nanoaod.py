@@ -35,7 +35,7 @@ class FrameworkNanoAOD(object):
         profile_out_path (bool): path to store the result of the profile. stdout if None
 
     """
-    def __init__(self, outdir, nanoaod_dir,
+    def __init__(self, outdir,
                  force = False, quiet = False,
                  parallel_mode = 'multiprocessing',
                  htcondor_job_desc_extra = [ ],
@@ -50,10 +50,9 @@ class FrameworkNanoAOD(object):
             quiet = quiet,
             n_processes = n_processes,
             user_modules = user_modules,
-            htcondor_job_desc_extra = htcondor_job_desc_extra
+            htcondor_job_desc_extra = htcondor_job_desc_extra,
         )
         self.outdir = outdir
-        self.nanoaod_dir = nanoaod_dir
         self.force =  force
         self.max_events_per_dataset = max_events_per_dataset
         self.max_events_per_process = max_events_per_process
@@ -158,8 +157,7 @@ class FrameworkNanoAOD(object):
 
         #if components == ['all']: components = None
         nanoaod_result = alphatwirl.nanoaod.NanoAODResult(
-            path = self.nanoaod_dir,
-            component_names = components,
+            component_df = components,
         )
         component_loop = alphatwirl.nanoaod.ComponentLoop(nanoaod_result, component_readers)
 

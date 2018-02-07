@@ -24,16 +24,17 @@ class Parallel(object):
         self.communicationChannel.end()
 
 
-def build_parallel(parallel_mode, quiet = True, n_processes = 4, user_modules = [ ], htcondor_job_desc_extra = [ ]):
+def build_parallel(parallel_mode, quiet = True, n_processes = 4, user_modules = [ ], htcondor_job_desc_extra = [ ], **kwargs):
 
     default_parallel_mode = 'multiprocessing'
 
-    if parallel_mode in ('subprocess', 'htcondor'):
+    if parallel_mode in ('subprocess', 'htcondor', 'sge'):
         return build_parallel_dropbox(
             parallel_mode = parallel_mode,
             quiet = quiet,
             user_modules = user_modules,
-            htcondor_job_desc_extra = htcondor_job_desc_extra
+            htcondor_job_desc_extra = htcondor_job_desc_extra,
+            **kwargs
         )
 
     if not parallel_mode == default_parallel_mode:
@@ -45,7 +46,7 @@ def build_parallel(parallel_mode, quiet = True, n_processes = 4, user_modules = 
     return build_parallel_multiprocessing(quiet = quiet, n_processes = n_processes)
 
 
-def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc_extra = [ ]):
+def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc_extra = [ ], **kwargs):
     tmpdir = '_ccsp_temp'
     user_modules = set(user_modules)
     user_modules.add('alphatwirl_interface')
@@ -62,6 +63,10 @@ def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc
         progressMonitor = alphatwirl.progressbar.BProgressMonitor(presentation=progressBar)
     if parallel_mode == 'htcondor':
         dispatcher = alphatwirl.concurrently.HTCondorJobSubmitter(job_desc_extra = htcondor_job_desc_extra)
+    elif parallel_mode == 'sge':
+        q = "hep.q" if "queue" not in kwargs else kwargs["queue"]
+        t = 10800 if "time" not in kwargs else kwargs["time"]
+        dispatcher = alphatwirl.concurrently.SGEJobSubmitter(queue=q, time=t)
     else:
         dispatcher = alphatwirl.concurrently.SubprocessRunner()
     workingArea = alphatwirl.concurrently.WorkingArea(
