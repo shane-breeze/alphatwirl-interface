@@ -43,7 +43,7 @@ class FrameworkNanoAOD(object):
                  user_modules = (),
                  max_events_per_dataset = -1, max_events_per_process = -1,
                  max_files_per_run = 1,
-                 profile = False, profile_out_path = None
+                 profile = True, profile_out_path = "prof.txt", #None
     ):
         self.parallel = build_parallel(
             parallel_mode = parallel_mode,
@@ -138,10 +138,10 @@ class FrameworkNanoAOD(object):
             collector.add(c)
         event_loop_runner = alphatwirl.loop.MPEventLoopRunner(self.parallel.communicationChannel)
         event_builder_config_maker = alphatwirl.nanoaod.EventBuilderConfigMaker(
-            tree_name = tree_name,
+            treeName = tree_name,
         )
         dataset_into_event_builders_splitter = alphatwirl.loop.DatasetIntoEventBuildersSplitter(
-            EventBuilder = alphatwirl.roottree.BEventBuilder,
+            EventBuilder = alphatwirl.nanoaod.EventBuilder,
             eventBuilderConfigMaker = event_builder_config_maker,
             maxEvents = self.max_events_per_dataset,
             maxEventsPerRun = self.max_events_per_process,

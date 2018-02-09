@@ -6,7 +6,7 @@ def profile_func(func, profile_out_path = None):
     import cProfile, pstats, StringIO
     pr = cProfile.Profile()
     pr.enable()
-    func()
+    result = func()
     pr.disable()
     s = StringIO.StringIO()
     sortby = 'cumulative'
@@ -18,5 +18,6 @@ def profile_func(func, profile_out_path = None):
         with open(profile_out_path, 'w') as f:
             f.write(s.getvalue())
             f.close()
+    return result
 
 ##__________________________________________________________________||
