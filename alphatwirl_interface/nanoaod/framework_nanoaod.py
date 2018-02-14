@@ -43,7 +43,7 @@ class FrameworkNanoAOD(object):
                  user_modules = (),
                  max_events_per_dataset = -1, max_events_per_process = -1,
                  max_files_per_run = 1,
-                 profile = True, profile_out_path = "prof.txt", #None
+                 profile = False, profile_out_path = "prof.txt", #None
     ):
         self.parallel = build_parallel(
             parallel_mode = parallel_mode,
