@@ -66,7 +66,7 @@ def build_parallel_dropbox(parallel_mode, quiet, user_modules, htcondor_job_desc
     elif parallel_mode == 'sge':
         q = "hep.q" if "queue" not in kwargs else kwargs["queue"]
         t = 10800 if "time" not in kwargs else kwargs["time"]
-        dispatcher = alphatwirl.concurrently.SGEJobSubmitter(queue=q, time=t)
+        dispatcher = alphatwirl.concurrently.SGEJobSubmitter(queue=q, walltime=t)
     else:
         dispatcher = alphatwirl.concurrently.SubprocessRunner()
     workingArea = alphatwirl.concurrently.WorkingArea(
